@@ -3,14 +3,12 @@ package com.github.kathybekh.doubleHashMap.model
 class DoubleHashingMap<K, V> : MutableMap<K, V> {
 
     private val defaultCapacity: Int = 16
-    private var map = arrayOfNulls<Entry<K, V>>(0)
+    internal var map = arrayOfNulls<Entry<K, V>>(0)
 
     override var size: Int = 0
 
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
-        get() {
-            TODO()
-        }
+        get() = map.filterNotNull().toMutableSet()
 
     override val keys: MutableSet<K>
         get() {
@@ -65,6 +63,9 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
         if (map.isEmpty()) {
             map = arrayOfNulls(defaultCapacity)
         }
+        if (loadFactor() > 75.0) {
+            resize()
+        }
         val index = index(key)
         val oldDoubleHashingEntry = map[index]
         map[index] = Entry(key, value)
@@ -96,5 +97,20 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
             }
         }
         return string
+    }
+
+    private fun loadFactor(): Double {
+        return size * 100.0 / map.size
+    }
+
+    private fun resize() {
+        val newMap = arrayOfNulls<Entry<K, V>>(map.size * 2)
+        size = 0
+        for (pair in map) {
+            if (pair != null) {
+                newMap[index(pair.key)] = pair
+            }
+        }
+        map = newMap
     }
 }
