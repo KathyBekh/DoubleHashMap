@@ -2,18 +2,22 @@ package com.github.kathybekh.doubleHashMap.view
 
 import com.github.kathybekh.doubleHashMap.controller.DoubleHashingMapController
 import javafx.geometry.Insets
+import javafx.scene.control.TextField
 import javafx.scene.image.ImageView
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.CornerRadii
 import javafx.scene.paint.Color
+import javafx.scene.text.Font
 import tornadofx.*
 
 class DoubleHashingMapView : View() {
     private val controller: DoubleHashingMapController by inject()
 
     override val root = BorderPane()
+    private var keyField: TextField by singleAssign()
+    private var valueField: TextField by singleAssign()
 
     private val rows = controller.display().observable()
     init {
@@ -37,28 +41,47 @@ class DoubleHashingMapView : View() {
             }
 
             center {
-                vbox {
+                vbox(16) {
                     form {
                         fieldset {
                             field("Key") {
-                                textfield()
+                                keyField = textfield()
                             }
                             field("Value") {
-                                textfield()
+                                valueField = textfield()
                             }
                         }
                     }
-                    button(graphic = ImageView("images/add.png").apply {
-                        fitWidth = 120.0
-                        fitHeight = 50.0
-                    })
-                    button(graphic = ImageView("images/find.png").apply {
-                        fitWidth = 120.0
-                        fitHeight = 50.0
-                    })
+//                    button(text = "bylia", graphic = imageview("images/add.png") {
+                    stackpane {
+                        button(graphic = imageview("images/green.png") {
+                            fitWidth = 150.0
+                            fitHeight = 50.0
+                        }) {
+                            action {
+                                controller.myMap[keyField.text] = valueField.text
+                                controller.display()
+                                println("key = ${keyField.text}")
+                                println("value = ${valueField.text}")
+                            }
+                        }
 
-                    button(graphic = ImageView("images/delete.png").apply {
-                        fitWidth = 120.0
+                        text("Добавить") {
+                            fill = Color.WHITE
+                            font = Font(20.0)
+                        }
+
+                    }
+
+                    button(graphic = ImageView("images/blue.png").apply {
+                        fitWidth = 150.0
+                        fitHeight = 50.0
+                    }).action {
+                        println("olololo")
+                    }
+
+                    button(graphic = ImageView("images/orange.png").apply {
+                        fitWidth = 150.0
                         fitHeight = 50.0
                     })
                 }

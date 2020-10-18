@@ -1,5 +1,7 @@
 package com.github.kathybekh.doubleHashMap.model
 
+import kotlin.math.abs
+
 class DoubleHashingMap<K, V> : MutableMap<K, V> {
 
     private val defaultCapacity: Int = 16
@@ -86,7 +88,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     }
 
     private fun index(k: K): Int {
-        return k.hashCode() % map.size
+        return abs(k.hashCode() % map.size)
     }
 
     override fun toString(): String {

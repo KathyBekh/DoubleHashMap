@@ -7,7 +7,7 @@ import tornadofx.Controller
 
 class DoubleHashingMapController : Controller() {
     private val view: DoubleHashingMapView by inject()
-    private val myMap = DoubleHashingMap<String, String>()
+    val myMap = DoubleHashingMap<String, String>()
 
     fun display() : List<TableRow> {
         myMap["fook"] = "pook"
