@@ -3,7 +3,6 @@ package com.github.kathybekh.doubleHashMap.view
 import com.github.kathybekh.doubleHashMap.controller.DoubleHashingMapController
 import javafx.geometry.Insets
 import javafx.scene.control.TextField
-import javafx.scene.image.ImageView
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.BorderPane
@@ -35,7 +34,7 @@ class DoubleHashingMapView : View() {
                     tableview(rows) {
                         readonlyColumn("Index", TableRow::id)
                         readonlyColumn("Key", TableRow::mapKey)
-                        readonlyColumn("Value", TableRow::mapValue).remainingWidth()
+                        readonlyColumn("Value", TableRow::mapValue)
                         columnResizePolicy = SmartResize.POLICY
                     }
                 }
@@ -54,58 +53,47 @@ class DoubleHashingMapView : View() {
                         }
                     }
 
-                    stackpane {
-                        button(graphic = imageview("images/green.png") {
-                            fitWidth = 150.0
-                            fitHeight = 50.0
-                        }).action {
-                            if (keyField.text != "") {
-                                controller.add(keyField.text, valueField.text)
-                                controller.updateTable(rows)
-                            }
-                        }
+                    val addButton = { imagePath: String, text: String,
+                                      action: () -> Unit ->
+                        {
+                            stackpane {
+                                button(graphic = imageview(imagePath) {
+                                    fitWidth = 150.0
+                                    fitHeight = 50.0
+                                }).action {
+                                    action()
+                                }
 
-                        text("ADD") {
-                            fill = Color.WHITE
-                            font = Font(20.0)
-                            isMouseTransparent = true
+                                text(text) {
+                                    fill = Color.WHITE
+                                    font = Font(20.0)
+                                    isMouseTransparent = true
+                                }
+                            }
                         }
                     }
 
-                    stackpane {
-                        button(graphic = imageview("images/blue.png") {
-                            fitWidth = 150.0
-                            fitHeight = 50.0
-                        }).action {
-                            if (keyField.text != "") {
-                                println(controller.find(keyField.text))
-                            }
+                    addButton("images/green.png", "ADD")
+                    {
+                        if (keyField.text != "") {
+                            controller.add(keyField.text, valueField.text)
+                            controller.updateTable(rows)
                         }
+                    }()
 
-                        text("FIND") {
-                            fill = Color.WHITE
-                            font = Font(20.0)
-                            isMouseTransparent = true
+                    addButton("images/blue.png", "FIND")
+                    {
+                        if (keyField.text != "") {
+                            println(controller.find(keyField.text))
                         }
-                    }
+                    }()
 
-                    stackpane {
-                        button(graphic = imageview("images/orange.png") {
-                            fitWidth = 150.0
-                            fitHeight = 50.0
-                        }).action {
-                            if (keyField.text != "") {
-                                controller.delete(keyField.text)
-                                controller.updateTable(rows)
-                            }
+                    addButton("images/orange.png", "DELETE") {
+                        if (keyField.text != "") {
+                            controller.delete(keyField.text)
+                            controller.updateTable(rows)
                         }
-
-                        text("DELETE") {
-                            fill = Color.WHITE
-                            font = Font(20.0)
-                            isMouseTransparent = true
-                        }
-                    }
+                    }()
                 }
             }
         }
