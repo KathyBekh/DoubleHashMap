@@ -71,7 +71,10 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
         val index = index(key)
         val oldDoubleHashingEntry = map[index]
         map[index] = Entry(key, value)
-        size += 1
+        if (oldDoubleHashingEntry != null) {
+            if (key != oldDoubleHashingEntry.key)
+                size += 1
+        }
         return oldDoubleHashingEntry?.value
     }
 
@@ -114,5 +117,9 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
             }
         }
         map = newMap
+    }
+
+    fun find(key: K): Entry<K, V>? {
+        return map[index(key)]
     }
 }

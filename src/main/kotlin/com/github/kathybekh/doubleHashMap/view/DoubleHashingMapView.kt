@@ -19,22 +19,23 @@ class DoubleHashingMapView : View() {
     private var keyField: TextField by singleAssign()
     private var valueField: TextField by singleAssign()
 
-    private val rows = controller.display().observable()
+    private var rows = controller.generateListOfRows().observable()
+
     init {
         title = "Double Hashing Map"
 
         with(root) {
             background = Background(
-                    BackgroundFill(Color.WHITESMOKE, CornerRadii.EMPTY, Insets.EMPTY)
+                BackgroundFill(Color.WHITESMOKE, CornerRadii.EMPTY, Insets.EMPTY)
             )
             top { }
 
             left {
                 stackpane {
                     tableview(rows) {
-                        readonlyColumn("ID", TableRow::id)
+                        readonlyColumn("Index", TableRow::id)
                         readonlyColumn("Key", TableRow::mapKey)
-                        readonlyColumn("Value", TableRow::mapValue)
+                        readonlyColumn("Value", TableRow::mapValue).remainingWidth()
                         columnResizePolicy = SmartResize.POLICY
                     }
                 }
@@ -52,38 +53,59 @@ class DoubleHashingMapView : View() {
                             }
                         }
                     }
-//                    button(text = "bylia", graphic = imageview("images/add.png") {
+
                     stackpane {
                         button(graphic = imageview("images/green.png") {
                             fitWidth = 150.0
                             fitHeight = 50.0
-                        }) {
-                            action {
-                                controller.myMap[keyField.text] = valueField.text
-                                controller.display()
-                                println("key = ${keyField.text}")
-                                println("value = ${valueField.text}")
+                        }).action {
+                            if (keyField.text != "") {
+                                controller.add(keyField.text, valueField.text)
+                                controller.updateTable(rows)
                             }
                         }
 
-                        text("Добавить") {
+                        text("ADD") {
                             fill = Color.WHITE
                             font = Font(20.0)
+                            isMouseTransparent = true
+                        }
+                    }
+
+                    stackpane {
+                        button(graphic = imageview("images/blue.png") {
+                            fitWidth = 150.0
+                            fitHeight = 50.0
+                        }).action {
+                            if (keyField.text != "") {
+                                println(controller.find(keyField.text))
+                            }
                         }
 
+                        text("FIND") {
+                            fill = Color.WHITE
+                            font = Font(20.0)
+                            isMouseTransparent = true
+                        }
                     }
 
-                    button(graphic = ImageView("images/blue.png").apply {
-                        fitWidth = 150.0
-                        fitHeight = 50.0
-                    }).action {
-                        println("olololo")
-                    }
+                    stackpane {
+                        button(graphic = imageview("images/orange.png") {
+                            fitWidth = 150.0
+                            fitHeight = 50.0
+                        }).action {
+                            if (keyField.text != "") {
+                                controller.delete(keyField.text)
+                                controller.updateTable(rows)
+                            }
+                        }
 
-                    button(graphic = ImageView("images/orange.png").apply {
-                        fitWidth = 150.0
-                        fitHeight = 50.0
-                    })
+                        text("DELETE") {
+                            fill = Color.WHITE
+                            font = Font(20.0)
+                            isMouseTransparent = true
+                        }
+                    }
                 }
             }
         }
