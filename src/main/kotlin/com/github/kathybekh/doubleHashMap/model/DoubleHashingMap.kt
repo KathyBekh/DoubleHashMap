@@ -58,7 +58,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     }
 
     override fun clear() {
-        map = arrayOfNulls<Entry<K, V>>(0)
+        map = arrayOfNulls(0)
         size = 0
     }
 
@@ -84,7 +84,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     }
 
     override fun remove(key: K): V? {
-        val index = index(key)
+        val index = findingIndex(key) ?: return null
         val oldDoubleHashingEntry = map[index]
         map[index] = null
         size -= 1
@@ -95,19 +95,19 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
         var ind = firstHash(key)
         if (!containsKey(key)) {
             while (map[ind] != null) {
-                ind = (ind + secondHash(key)) % map.size
+                ind = (ind + secondHash(key)) % tableSize
             }
         }
         return ind
     }
 
 
-    private fun firstHash(key: K): Int = abs(key.hashCode() % map.size)
+    private fun firstHash(key: K): Int = abs(key.hashCode() % tableSize)
 
     private fun secondHash(key: K): Int {
         var ind = key.hashCode()
         val newInd = ind * 0 + 1 //(19 * ind) xor ind
-        ind = abs(newInd % (map.size - 1))
+        ind = abs(newInd % (tableSize - 1))
         return ind
     }
 
@@ -138,7 +138,21 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
         map = newMap
     }
 
-    fun find(key: K): Entry<K, V>? {
-        return map[index(key)]
+    private fun findingIndex(key: K): Int? {
+        if (!containsKey(key)) return null
+        var indexKey = index(key)
+        var valueOfKeyWasInMap = map[indexKey]?.key
+        if (valueOfKeyWasInMap != key) {
+            while (valueOfKeyWasInMap != key) {
+                indexKey = (indexKey + secondHash(key)) % tableSize
+                valueOfKeyWasInMap = map[indexKey]?.key
+            }
+        }
+         return indexKey
+    }
+
+    fun find(key: K) : Entry<K, V>? {
+        val index = findingIndex(key)?: return null
+        return map[index]
     }
 }

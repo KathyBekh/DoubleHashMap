@@ -12,4 +12,12 @@ class Entry<K, V>(override val key: K, override var value: V) : MutableMap.Mutab
         return "$key - $value"
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Entry<*, *>
+
+        return key == other.key
+    }
 }

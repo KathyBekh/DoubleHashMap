@@ -8,7 +8,6 @@ import javafx.collections.ObservableList
 import tornadofx.Controller
 
 class DoubleHashingMapController : Controller() {
-    private val view: DoubleHashingMapView by inject()
     private val workMap = DoubleHashingMap<String, String>()
 
     fun add(key: String, value: String) {

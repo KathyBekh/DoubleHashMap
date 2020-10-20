@@ -75,8 +75,9 @@ class DoubleHashingMapView : View() {
 
                         addButton("images/blue.png", "FIND")
                         {
-                            if (keyField.text != "") {
-                                println(controller.find(keyField.text))
+                            val foundedValue = controller.find(keyField.text)
+                            if (keyField.text != "" && foundedValue != null) {
+                                println(foundedValue)
                             } else { println("The item you were looking for was not found!")}
                         }()
 
