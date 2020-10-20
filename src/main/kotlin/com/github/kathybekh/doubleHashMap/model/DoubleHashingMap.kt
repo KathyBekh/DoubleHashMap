@@ -8,6 +8,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     internal var map = arrayOfNulls<Entry<K, V>>(0)
 
     override var size: Int = 0
+    private var tableSize = 0
 
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
         get() = map.filterNotNull().toMutableSet()
@@ -64,6 +65,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     override fun put(key: K, value: V): V? {
         if (map.isEmpty()) {
             map = arrayOfNulls(defaultCapacity)
+            tableSize = defaultCapacity
         }
         if (loadFactor() > 75.0) {
             resize()
@@ -71,8 +73,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
         val index = index(key)
         val oldDoubleHashingEntry = map[index]
         map[index] = Entry(key, value)
-        if (oldDoubleHashingEntry != null) {
-            if (key != oldDoubleHashingEntry.key)
+        if (oldDoubleHashingEntry == null) {
                 size += 1
         }
         return oldDoubleHashingEntry?.value
@@ -90,8 +91,24 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
         return oldDoubleHashingEntry?.value
     }
 
-    private fun index(k: K): Int {
-        return abs(k.hashCode() % map.size)
+    private fun index(key: K): Int {
+        var ind = firstHash(key)
+        if (!containsKey(key)) {
+            while (map[ind] != null) {
+                ind = (ind + secondHash(key)) % map.size
+            }
+        }
+        return ind
+    }
+
+
+    private fun firstHash(key: K): Int = abs(key.hashCode() % map.size)
+
+    private fun secondHash(key: K): Int {
+        var ind = key.hashCode()
+        val newInd = ind * 0 + 1 //(19 * ind) xor ind
+        ind = abs(newInd % (map.size - 1))
+        return ind
     }
 
     override fun toString(): String {
@@ -105,15 +122,17 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     }
 
     private fun loadFactor(): Double {
-        return size * 100.0 / map.size
+        return size * 100.0 / tableSize
     }
 
     private fun resize() {
-        val newMap = arrayOfNulls<Entry<K, V>>(map.size * 2)
+        tableSize *= 2
+        val newMap = arrayOfNulls<Entry<K, V>>(tableSize)
         size = 0
         for (pair in map) {
             if (pair != null) {
                 newMap[index(pair.key)] = pair
+                size += 1
             }
         }
         map = newMap
