@@ -67,10 +67,10 @@ class DoubleHashingMapView : View() {
 
                         addButton("images/green.png", "ADD")
                         {
-                            if (keyField.text != "") {
+                            if (keyField.text != "" && valueField.text != "") {
                                 controller.add(keyField.text, valueField.text)
                                 controller.updateTable(rows)
-                            }
+                            } else { println("Not enough data! Enter key and value.")}
                         }()
 
                         addButton("images/blue.png", "FIND")
