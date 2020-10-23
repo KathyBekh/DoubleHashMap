@@ -80,7 +80,9 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     }
 
     override fun putAll(from: Map<out K, V>) {
-        TODO("Not yet implemented")
+        for (pair in from) {
+            map[index(pair.key)] = Entry(pair.key, pair.value)
+        }
     }
 
     override fun remove(key: K): V? {
@@ -106,7 +108,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
 
     private fun secondHash(key: K): Int {
         var ind = key.hashCode()
-        val newInd = ind * 0 + 1 //(19 * ind) xor ind
+        val newInd = (19 * ind) xor ind
         ind = abs(newInd % (tableSize - 1))
         return ind
     }
