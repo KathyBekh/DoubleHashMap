@@ -6,6 +6,7 @@ import com.github.kathybekh.doubleHashMap.view.DoubleHashingMapView
 import com.github.kathybekh.doubleHashMap.view.TableRow
 import javafx.collections.ObservableList
 import tornadofx.Controller
+import java.io.File
 
 class DoubleHashingMapController : Controller() {
     private val workMap = DoubleHashingMap<String, String>()
@@ -36,5 +37,12 @@ class DoubleHashingMapController : Controller() {
 
     fun delete(key: String) {
         workMap.remove(key)
+    }
+
+    fun readFromFile(file: File) {
+        file.forEachLine { line ->
+            val parseLine = line.split("-")
+            workMap[parseLine[0]] = parseLine[1]
+        }
     }
 }

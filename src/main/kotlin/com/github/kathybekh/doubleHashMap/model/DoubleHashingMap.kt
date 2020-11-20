@@ -108,7 +108,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
 
     private fun secondHash(key: K): Int {
         var ind = key.hashCode()
-        val newInd = (19 * ind) xor ind
+        val newInd = (19 * ind) xor ind + 1
         ind = abs(newInd % (tableSize - 1))
         return ind
     }

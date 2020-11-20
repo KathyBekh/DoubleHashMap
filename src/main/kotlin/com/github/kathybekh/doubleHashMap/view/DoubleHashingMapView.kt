@@ -6,12 +6,13 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
+import javafx.stage.FileChooser
 import tornadofx.*
 
 class DoubleHashingMapView : View() {
     private val controller: DoubleHashingMapController by inject()
 
-    override val root = HBox()
+    override val root = BorderPane()
     private var keyField: TextField by singleAssign()
     private var valueField: TextField by singleAssign()
 
@@ -24,14 +25,18 @@ class DoubleHashingMapView : View() {
             background = Background(
                 BackgroundFill(Color.WHITESMOKE, CornerRadii.EMPTY, Insets.EMPTY)
             )
-                    stackpane {
-                        tableview(rows) {
-                            readonlyColumn("Index", TableRow::id)
-                            readonlyColumn("Key", TableRow::mapKey)
-                            readonlyColumn("Value", TableRow::mapValue)
-                            columnResizePolicy = SmartResize.POLICY
-                        }
+            center {
+                stackpane {
+                    tableview(rows) {
+                        readonlyColumn("Index", TableRow::id)
+                        readonlyColumn("Key", TableRow::mapKey)
+                        readonlyColumn("Value", TableRow::mapValue)
+                        columnResizePolicy = SmartResize.POLICY
                     }
+                }
+            }
+
+            right {
 
                     vbox(16) {
                         form {
@@ -70,15 +75,19 @@ class DoubleHashingMapView : View() {
                             if (keyField.text != "" && valueField.text != "") {
                                 controller.add(keyField.text, valueField.text)
                                 controller.updateTable(rows)
-                            } else { println("Not enough data! Enter key and value.")}
+                            } else {
+                                println("Not enough data! Enter key and value.")
+                            }
                         }()
 
                         addButton("images/blue.png", "FIND")
                         {
-                            val foundedValue = controller.find(keyField.text)
-                            if (keyField.text != "" && foundedValue != null) {
-                                println(foundedValue)
-                            } else { println("The item you were looking for was not found!")}
+                            val foundValue = controller.find(keyField.text)
+                            if (keyField.text != "" && foundValue != null) {
+                                println(foundValue)
+                            } else {
+                                println("The item you were looking for was not found!")
+                            }
                         }()
 
                         addButton("images/orange.png", "DELETE") {
@@ -87,6 +96,19 @@ class DoubleHashingMapView : View() {
                                 controller.updateTable(rows)
                             }
                         }()
+
+                        addButton("images/yelow.png", "LOAD") {
+                            val dir = chooseFile(
+                                "Select File",
+                                arrayOf(FileChooser.ExtensionFilter("TEXT files (*.txt)", "*.txt"))
+                            )
+                            if (dir.isEmpty()) {
+                                return@addButton
+                            }
+                            controller.readFromFile(dir.first())
+                            controller.updateTable(rows)
+                        }()
+                    }
 
             }
         }
