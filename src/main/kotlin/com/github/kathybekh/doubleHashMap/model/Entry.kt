@@ -20,4 +20,10 @@ class Entry<K, V>(override val key: K, override var value: V) : MutableMap.Mutab
 
         return key == other.key
     }
+
+    override fun hashCode(): Int {
+        var result = key?.hashCode() ?: 0
+        result = 31 * result + (value?.hashCode() ?: 0)
+        return result
+    }
 }

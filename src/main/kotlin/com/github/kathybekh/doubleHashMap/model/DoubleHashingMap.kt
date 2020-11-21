@@ -135,7 +135,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     private fun resize() {
         tableSize *= 2
         val oldMap = entryStorage
-        entryStorage = arrayOfNulls<Entry<K, V>>(tableSize)
+        entryStorage = arrayOfNulls(tableSize)
         size = 0
         for (pair in oldMap) {
             if (pair != null) {
