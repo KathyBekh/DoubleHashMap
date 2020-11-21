@@ -9,7 +9,7 @@ class Entry<K, V>(override val key: K, override var value: V) : MutableMap.Mutab
         }
 
     override fun toString(): String {
-        return "$key - $value"
+        return "$key=$value"
     }
 
     override fun equals(other: Any?): Boolean {

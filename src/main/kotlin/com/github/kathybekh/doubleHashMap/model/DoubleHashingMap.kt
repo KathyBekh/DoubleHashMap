@@ -53,18 +53,13 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     }
 
     override fun isEmpty(): Boolean {
-        var bool = true
-        for (i in entryStorage) {
-            if (i != null) {
-                bool = false
-            }
-        }
-        return bool
+        return entryStorage.all { entry -> entry == null }
     }
 
     override fun clear() {
         entryStorage = arrayOfNulls(0)
         size = 0
+        tableSize = defaultCapacity
     }
 
     override fun put(key: K, value: V): V? {
@@ -130,13 +125,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     }
 
     override fun toString(): String {
-        var string = "keys - values \n"
-        for (i in entryStorage) {
-            if (i != null) {
-                string = "$string $i \n"
-            }
-        }
-        return string
+        return entryStorage.filterNotNull().joinToString(", ", "{", "}")
     }
 
     private fun loadFactor(): Double {

@@ -9,7 +9,4 @@ class DoubleHashingMapApp : App(DoubleHashingMapView:: class) { }
 
 fun main(args: Array<String>) {
     launch<DoubleHashingMapApp>()
-//
-//    val map = DoubleHashingMap<String, String>()
-
 }
