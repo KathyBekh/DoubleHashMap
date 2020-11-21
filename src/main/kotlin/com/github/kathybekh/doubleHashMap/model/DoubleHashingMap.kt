@@ -2,10 +2,16 @@ package com.github.kathybekh.doubleHashMap.model
 
 import kotlin.math.abs
 
+/**
+ * Provides a skeletal implementation of the [MutableMap] interface.
+ * @param K the type of map keys. The map is invariant in its key type.
+ * @param V the type of map values. The map is invariant in its value type.
+ */
+
 class DoubleHashingMap<K, V> : MutableMap<K, V> {
 
     private val defaultCapacity: Int = 16
-    internal var entryStorage = arrayOfNulls<Entry<K, V>>(0)
+    private var entryStorage = arrayOfNulls<Entry<K, V>>(0)
 
     override var size: Int = 0
     private var tableSize = 0
@@ -109,7 +115,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
 
         val shift = secondHash(key)
         do {
-            index = (index + shift) % tableSize
+            index = (index + shift + 1) % tableSize
         } while (entryStorage[index] != null)
         return index
     }
@@ -132,6 +138,9 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
         return size * 100.0 / tableSize
     }
 
+    /**
+     * This method changes the size of the storage by doubling it.
+     */
     private fun resize() {
         tableSize *= 2
         val oldMap = entryStorage
@@ -160,7 +169,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
         return index
     }
 
-    fun find(key: K): Entry<K, V>? {
+    internal fun find(key: K): Entry<K, V>? {
         val index = findIndex(key) ?: return null
         return entryStorage[index]
     }

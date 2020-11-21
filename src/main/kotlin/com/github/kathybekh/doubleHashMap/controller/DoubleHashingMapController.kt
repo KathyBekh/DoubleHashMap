@@ -10,14 +10,14 @@ import java.io.File
 class DoubleHashingMapController : Controller() {
     private val workMap = DoubleHashingMap<String, String>()
 
-    fun add(key: String, value: String) {
+    internal fun add(key: String, value: String) {
         workMap[key] = value
     }
 
-    fun generateListOfRows() : List<TableRow> {
+    internal fun generateListOfRows() : List<TableRow> {
         val l = mutableListOf<TableRow>()
         var ind = 0
-        for (pair in workMap.entryStorage) {
+        for (pair in workMap) {
             val q = TableRow(ind, pair?.key, pair?.value)
             l.add(q)
             ind += 1
@@ -25,23 +25,25 @@ class DoubleHashingMapController : Controller() {
         return l
     }
 
-    fun updateTable(rows: ObservableList<TableRow>) {
+    internal fun updateTable(rows: ObservableList<TableRow>) {
         rows.clear()
         rows.addAll(generateListOfRows())
     }
 
-    fun find(key: String): Entry<String, String>? {
+    internal fun find(key: String): Entry<String, String>? {
         return workMap.find(key)
     }
 
-    fun delete(key: String) {
+    internal fun delete(key: String) {
         workMap.remove(key)
     }
 
-    fun readFromFile(file: File) {
+    internal fun readFromFile(file: File) {
         file.forEachLine { line ->
             val parseLine = line.split("-")
             workMap[parseLine[0]] = parseLine[1]
         }
     }
+
+    internal fun entries(): MutableSet<MutableMap.MutableEntry<String, String>> = workMap.entries
 }
