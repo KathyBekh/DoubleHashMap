@@ -5,18 +5,18 @@ import kotlin.math.abs
 class DoubleHashingMap<K, V> : MutableMap<K, V> {
 
     private val defaultCapacity: Int = 16
-    internal var map = arrayOfNulls<Entry<K, V>>(0)
+    internal var entryStorage = arrayOfNulls<Entry<K, V>>(0)
 
     override var size: Int = 0
     private var tableSize = 0
 
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
-        get() = map.filterNotNull().toMutableSet()
+        get() = entryStorage.filterNotNull().toMutableSet()
 
     override val keys: MutableSet<K>
         get() {
             val keys = mutableSetOf<K>()
-            for (pair in map) {
+            for (pair in entryStorage) {
                 if (pair != null) {
                     keys.add(pair.key)
                 }
@@ -27,7 +27,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     override val values: MutableCollection<V>
         get() {
             val values = mutableSetOf<V>()
-            for (pair in map) {
+            for (pair in entryStorage) {
                 if (pair != null) {
                     values.add(pair.value)
                 }
@@ -44,12 +44,17 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     }
 
     override fun get(key: K): V? {
-        return map[index(key)]?.value
+        val index = findIndex(key)
+        return if (index == null) {
+            null
+        } else {
+            entryStorage[index]?.value
+        }
     }
 
     override fun isEmpty(): Boolean {
         var bool = true
-        for (i in map) {
+        for (i in entryStorage) {
             if (i != null) {
                 bool = false
             }
@@ -58,49 +63,60 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
     }
 
     override fun clear() {
-        map = arrayOfNulls(0)
+        entryStorage = arrayOfNulls(0)
         size = 0
     }
 
     override fun put(key: K, value: V): V? {
-        if (map.isEmpty()) {
-            map = arrayOfNulls(defaultCapacity)
+        if (entryStorage.isEmpty()) {
+            entryStorage = arrayOfNulls(defaultCapacity)
             tableSize = defaultCapacity
         }
         if (loadFactor() > 75.0) {
             resize()
         }
-        val index = index(key)
-        val oldDoubleHashingEntry = map[index]
-        map[index] = Entry(key, value)
-        if (oldDoubleHashingEntry == null) {
-                size += 1
+
+        val existingKeyIndex = findIndex(key)
+        return if (existingKeyIndex == null) {
+            entryStorage[newIndex(key)] = Entry(key, value)
+            size += 1
+            null
+        } else {
+            val oldValue = entryStorage[existingKeyIndex]!!.value
+            entryStorage[existingKeyIndex] = Entry(key, value)
+            return oldValue
         }
-        return oldDoubleHashingEntry?.value
     }
 
     override fun putAll(from: Map<out K, V>) {
         for (pair in from) {
-            map[index(pair.key)] = Entry(pair.key, pair.value)
+            entryStorage[newIndex(pair.key)] = Entry(pair.key, pair.value)
         }
     }
 
     override fun remove(key: K): V? {
-        val index = findingIndex(key) ?: return null
-        val oldDoubleHashingEntry = map[index]
-        map[index] = null
+        val index = findIndex(key) ?: return null
+        val oldDoubleHashingEntry = entryStorage[index]
+        entryStorage[index] = null
         size -= 1
         return oldDoubleHashingEntry?.value
     }
 
-    private fun index(key: K): Int {
-        var ind = firstHash(key)
-        if (!containsKey(key)) {
-            while (map[ind] != null) {
-                ind = (ind + secondHash(key)) % tableSize
-            }
+    /** Generates new index under assumptions that
+     * 1) there is empty space in entryStorage
+     * 2) key is not in entryStorage
+     */
+    private fun newIndex(key: K): Int {
+        var index = firstHash(key) % tableSize
+        if (entryStorage[index] == null) {
+            return index
         }
-        return ind
+
+        val shift = secondHash(key)
+        do {
+            index = (index + shift) % tableSize
+        } while (entryStorage[index] != null)
+        return index
     }
 
 
@@ -108,14 +124,14 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
 
     private fun secondHash(key: K): Int {
         var ind = key.hashCode()
-        val newInd = (19 * ind) xor ind + 1
+        val newInd = (19 * ind) xor ind
         ind = abs(newInd % (tableSize - 1))
         return ind
     }
 
     override fun toString(): String {
         var string = "keys - values \n"
-        for (i in map) {
+        for (i in entryStorage) {
             if (i != null) {
                 string = "$string $i \n"
             }
@@ -129,32 +145,34 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
 
     private fun resize() {
         tableSize *= 2
-        val newMap = arrayOfNulls<Entry<K, V>>(tableSize)
+        val oldMap = entryStorage
+        entryStorage = arrayOfNulls<Entry<K, V>>(tableSize)
         size = 0
-        for (pair in map) {
+        for (pair in oldMap) {
             if (pair != null) {
-                newMap[index(pair.key)] = pair
+                entryStorage[newIndex(pair.key)] = pair
                 size += 1
             }
         }
-        map = newMap
     }
 
-    private fun findingIndex(key: K): Int? {
+    private fun findIndex(key: K): Int? {
         if (!containsKey(key)) return null
-        var indexKey = index(key)
-        var valueOfKeyWasInMap = map[indexKey]?.key
-        if (valueOfKeyWasInMap != key) {
-            while (valueOfKeyWasInMap != key) {
-                indexKey = (indexKey + secondHash(key)) % tableSize
-                valueOfKeyWasInMap = map[indexKey]?.key
-            }
+
+        var index = firstHash(key) % tableSize
+        if (entryStorage[index]?.key == key) {
+            return index
         }
-         return indexKey
+
+        val shift = secondHash(key)
+        do {
+            index = (index + shift) % tableSize
+        } while (entryStorage[index]?.key != key)
+        return index
     }
 
-    fun find(key: K) : Entry<K, V>? {
-        val index = findingIndex(key)?: return null
-        return map[index]
+    fun find(key: K): Entry<K, V>? {
+        val index = findIndex(key) ?: return null
+        return entryStorage[index]
     }
 }

@@ -2,7 +2,6 @@ package com.github.kathybekh.doubleHashMap.controller
 
 import com.github.kathybekh.doubleHashMap.model.DoubleHashingMap
 import com.github.kathybekh.doubleHashMap.model.Entry
-import com.github.kathybekh.doubleHashMap.view.DoubleHashingMapView
 import com.github.kathybekh.doubleHashMap.view.TableRow
 import javafx.collections.ObservableList
 import tornadofx.Controller
@@ -18,7 +17,7 @@ class DoubleHashingMapController : Controller() {
     fun generateListOfRows() : List<TableRow> {
         val l = mutableListOf<TableRow>()
         var ind = 0
-        for (pair in workMap.map) {
+        for (pair in workMap.entryStorage) {
             val q = TableRow(ind, pair?.key, pair?.value)
             l.add(q)
             ind += 1
