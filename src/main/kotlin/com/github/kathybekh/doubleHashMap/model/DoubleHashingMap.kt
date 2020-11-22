@@ -54,7 +54,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
         return if (index == null) {
             null
         } else {
-            entryStorage[index]?.value
+            entryStorage[index]!!.value
         }
     }
 
