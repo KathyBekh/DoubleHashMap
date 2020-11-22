@@ -1,8 +1,8 @@
 package com.github.kathybekh.doubleHashMap
 
 import com.github.kathybekh.doubleHashMap.model.DoubleHashingMap
-import org.graalvm.compiler.debug.Assertions
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
 class DoubleHashingMapTest {
 
@@ -11,6 +11,13 @@ class DoubleHashingMapTest {
 
     @Test
     fun isEmpty() {
-//        Assertions(testMapStoS, true)
+        testMapStoS["first"] = "one"
+        val bool = testMapStoS.size == 1 && testMapStoS.containsKey("first") && testMapStoS.containsValue("one")
+        assertTrue(bool)
+    }
+
+    @Test
+    fun a(){
+
     }
 }

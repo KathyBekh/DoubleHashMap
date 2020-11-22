@@ -14,20 +14,20 @@ class DoubleHashingMapController : Controller() {
         workMap[key] = value
     }
 
-    internal fun generateListOfRows() : List<TableRow> {
-        val l = mutableListOf<TableRow>()
+    internal fun generateRows() : List<TableRow> {
+        val listOfRows = mutableListOf<TableRow>()
         var ind = 0
         for (pair in workMap) {
-            val q = TableRow(ind, pair?.key, pair?.value)
-            l.add(q)
+            val row = TableRow(ind, pair.key, pair.value)
+            listOfRows.add(row)
             ind += 1
         }
-        return l
+        return listOfRows
     }
 
     internal fun updateTable(rows: ObservableList<TableRow>) {
         rows.clear()
-        rows.addAll(generateListOfRows())
+        rows.addAll(generateRows())
     }
 
     internal fun find(key: String): Entry<String, String>? {
@@ -40,10 +40,18 @@ class DoubleHashingMapController : Controller() {
 
     internal fun readFromFile(file: File) {
         file.forEachLine { line ->
-            val parseLine = line.split("-")
-            workMap[parseLine[0]] = parseLine[1]
+            val parseLine = line.split(" - ")
+            if (parseLine.size >= 2) {
+                workMap[parseLine[0]] = parseLine[1]
+            }
         }
     }
 
-    internal fun entries(): MutableSet<MutableMap.MutableEntry<String, String>> = workMap.entries
+    internal fun clear() {
+        workMap.clear()
+    }
+
+    internal fun entries(): MutableSet<MutableMap.MutableEntry<String, String>> {
+        return workMap.entries
+    }
 }

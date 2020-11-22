@@ -91,7 +91,9 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
 
     override fun putAll(from: Map<out K, V>) {
         for (pair in from) {
-            entryStorage[newIndex(pair.key)] = Entry(pair.key, pair.value)
+            val key = pair.key
+            val value = pair.value
+            put(key, value)
         }
     }
 
@@ -108,14 +110,15 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
      * 2) key is not in entryStorage
      */
     private fun newIndex(key: K): Int {
-        var index = firstHash(key) % tableSize
+        var index = firstHash(key)
         if (entryStorage[index] == null) {
             return index
         }
 
-        val shift = secondHash(key)
+        var shift = secondHash(key)
         do {
-            index = (index + shift + 1) % tableSize
+            index = (index + shift) % tableSize
+            shift += 1
         } while (entryStorage[index] != null)
         return index
     }
@@ -162,9 +165,10 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
             return index
         }
 
-        val shift = secondHash(key)
+        var shift = secondHash(key)
         do {
             index = (index + shift) % tableSize
+            shift += 1
         } while (entryStorage[index]?.key != key)
         return index
     }
@@ -173,4 +177,5 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
         val index = findIndex(key) ?: return null
         return entryStorage[index]
     }
+
 }
