@@ -18,9 +18,8 @@ class DoubleHashingMapController : Controller() {
         val listOfRows = mutableListOf<TableRow>()
         var ind = 0
         for (pair in workMap) {
-            val row = TableRow(ind, pair.key, pair.value)
+            val row = TableRow(ind++, pair.key, pair.value)
             listOfRows.add(row)
-            ind += 1
         }
         return listOfRows
     }

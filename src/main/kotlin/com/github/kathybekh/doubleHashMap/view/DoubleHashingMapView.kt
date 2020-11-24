@@ -133,7 +133,7 @@ class DoubleHashingMapView : View() {
                             }
                         }()
 
-                        addButton("images/yellow.png", "LOAD") {
+                        addButton("images/purple.png", "LOAD") {
                             val dir = chooseFile(
                                 "Select File",
                                 arrayOf(FileChooser.ExtensionFilter("TEXT files (*.txt)", "*.txt"))
