@@ -14,6 +14,7 @@ class DoubleHashingMapController : Controller() {
         workMap[key] = value
     }
 
+//    Generate table rows to display in GUI.
     internal fun generateRows() : List<TableRow> {
         val listOfRows = mutableListOf<TableRow>()
         var ind = 0
@@ -37,6 +38,8 @@ class DoubleHashingMapController : Controller() {
         workMap.remove(key)
     }
 
+//   File format: *.txt , is specified in DoubleHashingMapView, chooseFile()
+//   File line format: key - value
     internal fun readFromFile(file: File) {
         file.forEachLine { line ->
             val parseLine = line.split(" - ")

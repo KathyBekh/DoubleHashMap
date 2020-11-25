@@ -85,7 +85,7 @@ class DoubleHashingMap<K, V> : MutableMap<K, V> {
         } else {
             val oldValue = entryStorage[existingKeyIndex]!!.value
             entryStorage[existingKeyIndex] = Entry(key, value)
-            return oldValue
+            oldValue
         }
     }
 

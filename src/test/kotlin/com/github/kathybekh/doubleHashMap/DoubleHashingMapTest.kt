@@ -5,6 +5,8 @@ import com.github.kathybekh.doubleHashMap.model.Entry
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
+// Тесты покрывают код если они заходят в каждую функцию и в каждый if в этих функциях.
+
 class DoubleHashingMapTest {
 
     private val testMapStoS = DoubleHashingMap<String, String>()
@@ -45,6 +47,14 @@ class DoubleHashingMapTest {
         testMapItoS.putAll(entryMap)
         val findElement = testMapItoS.find(3)
         assertEquals(findElement, Entry(3, "three"))
+    }
+
+    @Test
+    fun testNotFind() {
+        testMapItoS.putAll(entryMap)
+        testMapItoS.remove(3)
+        val findElement = testMapItoS.find(3)
+        assertEquals(findElement, null)
     }
 
     @Test
